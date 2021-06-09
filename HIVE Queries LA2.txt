@@ -1,0 +1,96 @@
+1) Prerequisites creation of db, tables and loading of data.csv
+
+sudo su - hadoop
+echo $HIVE_HOME
+echo $PATH
+jps
+hive
+create database EmployeeDB;
+use EmployeeDB;
+
+create table Employee(Name string,SSN int,Salary int,Awards int,TaxPaid
+> string,Eligibleforraise string)
+> row format delimited 
+> fields terminated by ",";
+
+LOAD DATA local INPATH "/home/hadoop/Desktop/data.csv" into table Employee;
+
+2) Insert 5 records using the INSERT command
+
+insert into Employee values
+> ("James",787345, 93214, 1, "NO", "YES");
+> ("Nikki", 63296, 98058, 2, "YES","NO"),
+> ("Jos", 63297,12600, 1, "NO","NO"),
+> ("Alain", 63298, 6300, 4, "NO","YES"),
+> ("Ayrton", 63299, 41700, 3, "YES","YES");
+
+3) Demonstrate the Alter command for the following cases
+
+Rename the table name to “Emp”
+Rename the column name “Eligible for Pay raise” to “Eligibility”
+
+ALTER TABLE Employee RENAME TO Emp;
+ALTER TABLE emp CHANGE Eligibleforraise Eligibility string;
+
+4) Count the number of Employees who are eligible for pay raise who had paid the tax
+
+select count(*)
+> from emp
+> where eligibility="YES" and taxpaid="YES";
+
+5) Extract all the users ordered by the Name who had paid the tax but are not eligible for pay raise
+
+select (name)
+> from emp
+> where taxpaid="YES" and eligibility="NO"
+> order by name;
+
+6) Create a separate view containing “SSN and Salary” and call the view as sal_ssn_view
+create view sal_ssn_view as
+> select ssn,salary from emp;
+
+select * from sal_ssn_view;
+
+7) Display (name, eligibility) fields grouped by the SSN
+
+select ssn, name, eligibility
+> from emp
+> group by ssn, name, eligibility;
+
+8) Display the (Name, SSN) of employees whose salary is >40000 but < 48000
+
+select name,ssn 
+> from emp
+> where salary between 40000 and 48000;
+
+9) Create table orders 
+
+create table orders (orderid int, custssn int, Amount int)
+> row format delimited 
+> fields terminated by ",";
+
+10) Insert single row into orders 
+
+insert into orders 
+> values (63,61302,50000);
+
+11) Left Outer Join 
+
+select o.orderid, e.ssn, e.name, o.amount
+> from emp e
+> LEFT OUTER JOIN orders o
+> ON (e.ssn = o.custssn);
+
+12) Right Outer Join 
+
+select o.orderid, e.ssn, e.name, o.amount
+> from emp e
+> RIGHT OUTER JOIN orders o
+> ON (e.ssn = o.custssn);
+
+13) Outer Join 
+
+select o.orderid, e.ssn, e.name, o.amount
+> from emp e
+> FULL OUTER JOIN orders o
+> ON (e.ssn = o.custssn); 
